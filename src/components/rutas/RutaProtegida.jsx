@@ -1,14 +1,22 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
+import { supabase } from "../../database/supabaseconfig";
 
 const RutaProtegida = ({ children }) => {
-  // Verifica si el usuario está autenticado usando localStorage
-  const estaLogueado = !!localStorage.getItem("usuario-supabase");
+  const [loading, setLoading] = useState(true);
+  const [estaLogueado, setEstaLogueado] = useState(false);
 
-  // Log para depuración
-  console.log("Usuario autenticado:", estaLogueado);
+  useEffect(() => {
+    const verificarSesion = async () => {
+      const { data } = await supabase.auth.getSession();
+      setEstaLogueado(!!data.session);
+      setLoading(false);
+    };
+    verificarSesion();
+  }, []);
 
-  // Si está autenticado, permite acceso; si no, redirige a login
+  if (loading) return null;
+
   return estaLogueado ? children : <Navigate to="/login" replace />;
 };
 

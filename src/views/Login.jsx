@@ -22,7 +22,7 @@ const Login = () => {
         return;
       }
 
-      if (data.user) {
+      if (data?.session?.user) {
         localStorage.setItem("usuario-supabase", usuario);
       }
 
