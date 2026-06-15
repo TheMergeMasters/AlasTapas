@@ -15,7 +15,7 @@ const FormularioLogin = ({
       <div className="login-panel-marca">
         <img src={logo} alt="AlasTapas" className="login-logo" />
         <h1>AlasTapas</h1>
-        <p>Gestiona tu negocio de tapas con facilidad y control total.</p>
+        <p>Gestiona Tu Negocio de Comida Rapida Con Facilidad y Control Total.</p>
         <span className="login-badge">
           <i className="bi bi-shield-lock-fill" />
           Acceso seguro
