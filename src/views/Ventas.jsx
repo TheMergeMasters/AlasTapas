@@ -9,6 +9,7 @@ import TarjetaVenta from "../components/ventas/TarjetaVenta";
 import Paginacion from "../components/ordenamiento/Paginacion";
 import NotificacionOperacion from "../components/NotificacionOperacion";
 import CuadroBusquedas from "../components/busquedas/CuadroBusquedas";
+import EncabezadoVista from "../components/layout/EncabezadoVista";
 
 const Ventas = () => {
   const [ventas, setVentas] = useState([]);
@@ -332,22 +333,18 @@ const Ventas = () => {
   };
 
   return (
-    <Container className="mt-3">
-      <Row className="align-items-center mb-3">
-        <Col className="d-flex align-items-center">
-          <h2 className="mb-0 fw-bold d-flex align-items-center">
-            <i className="bi bi-cash-coin me-2"></i> Ventas
-          </h2>
-        </Col>
-        <Col xs={4} sm={5} className="text-end">
-          <Button onClick={() => setMostrarModal(true)}>
+    <Container fluid className="vista-contenedor px-3 px-md-4">
+      <EncabezadoVista
+        titulo="Ventas"
+        icono="bi bi-cash-coin"
+        subtitulo="Consulta y registra las ventas del negocio"
+        acciones={
+          <Button onClick={() => setMostrarModal(true)} className="btn-marca">
             <i className="bi-plus-lg"></i>
             <span className="d-none d-sm-inline ms-2">Nueva Venta</span>
           </Button>
-        </Col>
-      </Row>
-
-      <hr />
+        }
+      />
 
       <Row className="mb-4">
         <Col md={6} lg={5}>
@@ -377,7 +374,8 @@ const Ventas = () => {
       {/* Vista Escritorio */}
       <Row className="d-none d-lg-block">
         <Col xs={12}>
-          <TablaVenta
+          <div className="vista-panel">
+            <TablaVenta
             ventas={ventasPaginadas}
             ordenesDisponibles={ordenesDisponibles}
             clientesDisponibles={clientesDisponibles}
@@ -387,6 +385,7 @@ const Ventas = () => {
             abrirModalEdicion={abrirModalEdicion}
             abrirModalCancelacion={abrirModalCancelacion}
           />
+          </div>
         </Col>
       </Row>
 

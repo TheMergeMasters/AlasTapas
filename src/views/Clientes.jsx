@@ -9,6 +9,7 @@ import TarjetaCliente from "../components/clientes/TarjetaCliente";
 import ModalRegistroCliente from "../components/clientes/ModalRegistroCliente";
 import ModalEdicionCliente from "../components/clientes/ModalEdicionCliente";
 import ModalEliminacionCliente from "../components/clientes/ModalEliminacionCliente";
+import EncabezadoVista from "../components/layout/EncabezadoVista";
 
 const Clientes = () => {
   const [toast, setToast] = useState({ mostrar: false, mensaje: "", tipo: "" });
@@ -291,26 +292,23 @@ const Clientes = () => {
   };
 
   return (
-
-    <Container className="mt-3">
-      {/* Título y botón Nuevo Cliente */}
-      <Row className="align-items-center mb-3">
-        <Col xs={9} sm={7} md={7} lg={7} className="d-flex align-items-center">
-          <h3 className="mb-0">
-            <i className="bi-bookmark-plus-fill me-2"></i> Clientes
-          </h3>
-        </Col>
-        <Col xs={3} sm={5} md={5} lg={5} className="text-end">
-          <Button onClick={() => setMostrarModal(true)} size="md">
+    <Container fluid className="vista-contenedor px-3 px-md-4">
+      <EncabezadoVista
+        titulo="Clientes"
+        icono="bi bi-people-fill"
+        subtitulo="Gestiona la información de tus clientes"
+        acciones={
+          <Button
+            onClick={() => setMostrarModal(true)}
+            className="btn-marca"
+            size="md"
+          >
             <i className="bi-plus-lg"></i>
             <span className="d-none d-sm-inline ms-2">Nuevo Cliente</span>
           </Button>
-        </Col>
-      </Row>
+        }
+      />
 
-      <hr />
-
-       {/* Cuadro de busqueda */}
       <Row className="mb-4">
         <Col md={6} lg={5}>
           <CuadroBusquedas
@@ -325,7 +323,7 @@ const Clientes = () => {
       {!cargando && textoBusqueda.trim() && clientesFiltrados.length === 0 && (
           <Row className="mb-4">
             <Col>
-              <Alert variant="info" className="text-center">
+              <Alert variant="info" className="text-center alerta-marca">
                 <i className="bi-info-circle me-2"></i>
                 No se encontraron clientes que coincidan con la búsqueda.
               </Alert>
@@ -344,11 +342,13 @@ const Clientes = () => {
             />
           </Col>
           <Col lg={12} className="d-none d-lg-block">
-            <TablaClientes
+            <div className="vista-panel">
+              <TablaClientes
               clientes={clientesFiltrados}
               abrirModalEdicion={abrirModalEdicion}
               abrirModalEliminacion={abrirModalEliminacion}
             />
+            </div>
           </Col>
         </Row>
       )}
@@ -356,10 +356,10 @@ const Clientes = () => {
 
       {/* Spinner mientras se cargan las categorías */}
       {cargando && (
-        <Row className="text-center my-5">
+        <Row className="text-center my-5 carga-marca">
           <Col>
-            <Spinner animation="border" variant="success" size="lg" />
-            <p className="mt-3 text-muted">Cargando clientes...</p>
+            <Spinner animation="border" size="lg" />
+            <p className="mt-3">Cargando clientes...</p>
           </Col>
         </Row>
       )}
@@ -378,12 +378,14 @@ const Clientes = () => {
       {!cargando && !textoBusqueda.trim() && clientes.length > 0 &&  (
         <Row>
           <Col lg={12} className="d-none d-lg-block">
-            <TablaClientes
+            <div className="vista-panel">
+              <TablaClientes
               clientes={clientes}
 
               abrirModalEdicion={abrirModalEdicion}
               abrirModalEliminacion={abrirModalEliminacion}
             />
+            </div>
           </Col>
         </Row>
       )}

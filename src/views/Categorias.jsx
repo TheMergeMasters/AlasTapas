@@ -9,6 +9,7 @@ import TarjetaCategoria from "../components/categorias/TarjetaCategoria";
 import NotificacionOperacion from "../components/NotificacionOperacion";
 import CuadroBusquedas from "../components/busquedas/CuadroBusquedas";
 import Paginacion from "../components/ordenamiento/Paginacion";
+import EncabezadoVista from "../components/layout/EncabezadoVista";
 import jsPDF from "jspdf";
 
 const Categorias = () => {
@@ -332,25 +333,23 @@ const Categorias = () => {
 
  
   return (
-    <Container className="mt-3">
-      {/* Título y botón Nueva Categoría */}
-      <Row className="align-items-center mb-3">
-        <Col xs={9} sm={7} md={7} lg={7} className="d-flex align-items-center">
-          <h3 className="mb-0">
-            <i className="bi-bookmark-plus-fill me-2"></i> Categorías
-          </h3>
-        </Col>
-        <Col xs={3} sm={5} md={5} lg={5} className="text-end">
-          <Button onClick={() => setMostrarModal(true)} size="md">
+    <Container fluid className="vista-contenedor px-3 px-md-4">
+      <EncabezadoVista
+        titulo="Categorías"
+        icono="bi bi-bookmark-fill"
+        subtitulo="Organiza los productos por categorías"
+        acciones={
+          <Button
+            onClick={() => setMostrarModal(true)}
+            className="btn-marca"
+            size="md"
+          >
             <i className="bi-plus-lg"></i>
             <span className="d-none d-sm-inline ms-2">Nueva Categoría</span>
           </Button>
-        </Col>
-      </Row>
+        }
+      />
 
-      <hr />
-
-      {/* Cuadro de busqueda */}
       <Row className="mb-4">
         <Col md={6} lg={5}>
           <CuadroBusquedas
@@ -367,7 +366,7 @@ const Categorias = () => {
         categoriasFiltradas.length === 0 && (
           <Row className="mb-4">
             <Col>
-              <Alert variant="info" className="text-center">
+              <Alert variant="info" className="text-center alerta-marca">
                 <i className="bi-info-circle me-2"></i>
                 No se encontraron categorías que coincidan con la búsqueda.
               </Alert>
@@ -387,23 +386,25 @@ const Categorias = () => {
             />
           </Col>
           <Col lg={12} className="d-none d-lg-block">
-            <TablaCategorias
+            <div className="vista-panel">
+              <TablaCategorias
               categorias={categoriasPaginadas}
               abrirModalEdicion={abrirModalEdicion}
               abrirModalEliminacion={abrirModalEliminacion}
               generarPDFCategoria={generarPDFCategoria}
               copiarCategoria={copiarCategoria}
             />
+            </div>
           </Col>
         </Row>
       )}
 
       {/* Spinner mientras se cargan las categorías */}
       {cargando && (
-        <Row className="text-center my-5">
+        <Row className="text-center my-5 carga-marca">
           <Col>
-            <Spinner animation="border" variant="success" size="lg" />
-            <p className="mt-3 text-muted">Cargando categorías...</p>
+            <Spinner animation="border" size="lg" />
+            <p className="mt-3">Cargando categorías...</p>
           </Col>
         </Row>
       )}
@@ -421,13 +422,15 @@ const Categorias = () => {
       {!cargando && !textoBusqueda.trim() && categorias.length > 0 && (
         <Row>
           <Col lg={12} className="d-none d-lg-block">
-            <TablaCategorias
+            <div className="vista-panel">
+              <TablaCategorias
               categorias={categorias}
               abrirModalEdicion={abrirModalEdicion}
               abrirModalEliminacion={abrirModalEliminacion}
               generarPDFCategoria={generarPDFCategoria}
               copiarCategoria={copiarCategoria}
             />
+            </div>
           </Col>
         </Row>
       )}

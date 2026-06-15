@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Row, Col, Card, Spinner, Form, Button } from "react-bootstrap";
+import { Container, Row, Col, Card, Spinner, Form, Button } from "react-bootstrap";
 import { Chart as ChartJS, registerables } from "chart.js";
 import { supabase } from "../database/supabaseconfig";
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import html2canvas from "html2canvas";
+import EncabezadoVista from "../components/layout/EncabezadoVista";
 
 ChartJS.register(...registerables);
 
@@ -534,25 +535,22 @@ const Inicio = () => {
 
   if (cargando) {
     return (
-      <div className="text-center py-5">
+      <div className="vista-contenedor text-center py-5 carga-marca">
         <Spinner animation="border" size="lg" />
-        <p className="mt-3 text-muted">Cargando estadísticas...</p>
+        <p className="mt-3">Cargando estadísticas...</p>
       </div>
     );
   }
 
   return (
-    <div className="container-fluid py-4">
-      <div className="mb-4">
-        <h2>
-          <i className="bi bi-speedometer2 me-2"></i>
-          Inicio
-        </h2>
+    <Container fluid className="vista-contenedor px-3 px-md-4">
+      <EncabezadoVista
+        titulo="Inicio"
+        icono="bi bi-speedometer2"
+        subtitulo="Estadísticas del negocio"
+      />
 
-        <p className="text-muted">Estadísticas del negocio</p>
-      </div>
-
-      <Row className="g-3 align-items-end mb-4">
+      <Row className="g-3 align-items-end mb-4 formulario-marca">
         <Col xs={6} md={3}>
           <Form.Group>
             <Form.Label>Desde</Form.Label>
@@ -578,20 +576,20 @@ const Inicio = () => {
         </Col>
 
         <Col md={6} className="d-flex align-items-end gap-2 flex-wrap">
-          <Button variant="success" onClick={descargarExcel}>
+          <Button className="btn-marca" onClick={descargarExcel}>
             <i className="bi bi-file-earmark-excel me-2"></i>
             Descargar Excel
           </Button>
 
           <Button
-            variant="outline-danger"
+            className="btn-marca-outline"
             onClick={generarPdfEstadisticasGenerales}
           >
             <i className="bi bi-file-earmark-pdf me-2"></i>
             Reporte General
           </Button>
 
-          <Button variant="outline-info" onClick={generarPdfCategoria}>
+          <Button className="btn-marca-outline" onClick={generarPdfCategoria}>
             <i className="bi bi-pie-chart me-2"></i>
             Reporte Categoría
           </Button>
@@ -600,12 +598,7 @@ const Inicio = () => {
 
       <Row className="g-4 mb-4">
         <Col xs={12} md={6} lg={3}>
-          <Card
-            className="h-100 text-white"
-            style={{
-              background: "linear-gradient(135deg,#330775,#5ea5f1)",
-            }}
-          >
+          <Card className="h-100 text-white vista-tarjeta-estadistica vista-tarjeta--ventas">
             <Card.Body>
               <h5>
                 <i className="bi bi-cash-stack me-2"></i>
@@ -618,12 +611,7 @@ const Inicio = () => {
         </Col>
 
         <Col xs={12} md={6} lg={3}>
-          <Card
-            className="h-100 text-white"
-            style={{
-              background: "linear-gradient(135deg,#198754,#34ce57)",
-            }}
-          >
+          <Card className="h-100 text-white vista-tarjeta-estadistica vista-tarjeta--ordenes">
             <Card.Body>
               <h5>
                 <i className="bi bi-receipt me-2"></i>
@@ -636,12 +624,7 @@ const Inicio = () => {
         </Col>
 
         <Col xs={12} md={6} lg={3}>
-          <Card
-            className="h-100 text-white"
-            style={{
-              background: "linear-gradient(135deg,#1068db,#5ea5f1)",
-            }}
-          >
+          <Card className="h-100 text-white vista-tarjeta-estadistica vista-tarjeta--cantidad">
             <Card.Body>
               <h5>
                 <i className="bi bi-bag-check me-2"></i>
@@ -654,12 +637,7 @@ const Inicio = () => {
         </Col>
 
         <Col xs={12} md={6} lg={3}>
-          <Card
-            className="h-100 text-white"
-            style={{
-              background: "linear-gradient(135deg,#e27d01,#ffa500)",
-            }}
-          >
+          <Card className="h-100 text-white vista-tarjeta-estadistica vista-tarjeta--productos">
             <Card.Body>
               <h5>
                 <i className="bi bi-box-seam me-2"></i>
@@ -674,9 +652,12 @@ const Inicio = () => {
 
       <Row className="g-4">
         <Col xs={12} lg={8}>
-          <Card>
+          <Card className="vista-panel border-0">
             <Card.Body ref={graficoHoraRef}>
-              <h5 className="mb-3">Ventas por Hora</h5>
+              <h5 className="vista-panel-titulo mb-3">
+                <i className="bi bi-graph-up" />
+                Ventas por Hora
+              </h5>
 
               <div
                 style={{
@@ -688,8 +669,8 @@ const Inicio = () => {
               </div>
             </Card.Body>
 
-            <Card.Footer>
-              <Button variant="outline-danger" onClick={generarPdfVentasHora}>
+            <Card.Footer className="bg-transparent border-0 pt-0">
+              <Button className="btn-marca-outline" onClick={generarPdfVentasHora}>
                 <i className="bi bi-file-earmark-pdf me-2"></i>
                 Descargar PDF
               </Button>
@@ -698,9 +679,12 @@ const Inicio = () => {
         </Col>
 
         <Col xs={12} lg={4}>
-          <Card>
+          <Card className="vista-panel border-0">
             <Card.Body ref={graficoCategoriasRef}>
-              <h5 className="mb-3">Ventas por Categoría</h5>
+              <h5 className="vista-panel-titulo mb-3">
+                <i className="bi bi-pie-chart" />
+                Ventas por Categoría
+              </h5>
 
               <div
                 style={{
@@ -723,8 +707,8 @@ const Inicio = () => {
               </div>
             </Card.Body>
 
-            <Card.Footer>
-              <Button variant="outline-info" onClick={generarPdfCategoria}>
+            <Card.Footer className="bg-transparent border-0 pt-0">
+              <Button className="btn-marca-outline" onClick={generarPdfCategoria}>
                 <i className="bi bi-pie-chart me-2"></i>
                 Descargar PDF
               </Button>
@@ -732,7 +716,7 @@ const Inicio = () => {
           </Card>
         </Col>
       </Row>
-    </div>
+    </Container>
   );
 };
 

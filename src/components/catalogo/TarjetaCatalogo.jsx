@@ -59,7 +59,7 @@ const TarjetaCatalogo = ({ producto, categoriaNombre }) => {
             <Card.Text className="text-muted small flex-grow-1">
               {previsualizacionTexto}
               {tieneMasTexto && (
-                <span className="text-primary fw-medium ms-1">
+                <span className="ms-1" style={{ color: "var(--at-azul)" }}>
                   {" Leer más"}
                 </span>
               )}
@@ -73,7 +73,7 @@ const TarjetaCatalogo = ({ producto, categoriaNombre }) => {
           )}
           <hr />
           <div className="mt-auto pt-2">
-            <h4 className="text-success fw-bold mb-0">
+            <h4 className="fw-bold mb-0" style={{ color: "var(--at-primario)" }}>
               C${parseFloat(producto.precio_costo).toFixed(1)}
             </h4>
           </div>
@@ -123,7 +123,7 @@ const TarjetaCatalogo = ({ producto, categoriaNombre }) => {
                 </Badge>
               </div>
 
-              <h3 className="text-success fw-bold mb-4">
+              <h3 className="fw-bold mb-4" style={{ color: "var(--at-primario)" }}>
                 C${parseFloat(producto.precio_costo).toFixed(1)}
               </h3>
 

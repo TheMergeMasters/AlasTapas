@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import {Container,Row,Col,Button,Spinner,Alert,Form,} from "react-bootstrap";
+import {Container, Row, Col, Spinner, Alert, Form} from "react-bootstrap";
 import { supabase } from "../database/supabaseconfig";
 import TarjetaCatalogo from "../components/catalogo/TarjetaCatalogo";
 import CuadroBusquedas from "../components/busquedas/CuadroBusquedas";
@@ -86,20 +86,22 @@ const Catalogo = () => {
   };
 
   return (
-    <div className="mt-3 px-1">
-      <Row className="text-center mb-1">
-        <Col>
-          <p className="lead text-muted">Nuestros productos AlasTapas</p>
-        </Col>
-      </Row>
+    <Container fluid className="vista-contenedor px-3 px-md-4">
+      <div className="catalogo-encabezado">
+        <h2>
+          <i className="bi bi-images me-2" />
+          Catálogo AlasTapas
+        </h2>
+        <p>Nuestros productos de comida rápida</p>
+      </div>
 
-      <Row className="mb-1 align-items-end">
+      <Row className="mb-4 align-items-end formulario-marca">
         <Col md={4} lg={3} className="mb-2">
           <Form.Group controlId="filtroCategoria">
+            <Form.Label className="small fw-semibold">Categoría</Form.Label>
             <Form.Select
               value={categoriaSeleccionada}
               onChange={manejarCambioCategoria}
-              className="shadow-sm"
             >
               <option value="todas">Todas las categorías</option>
               {categorias.map((cat) => (
@@ -123,16 +125,16 @@ const Catalogo = () => {
 
       {/* Estados */}
       {cargando && (
-        <Row className="text-center my-5">
+        <Row className="text-center my-5 carga-marca">
           <Col>
-            <Spinner animation="border" variant="success" size="lg" />
-            <p className="mt-3 text-muted">Cargando productos...</p>
+            <Spinner animation="border" size="lg" />
+            <p className="mt-3">Cargando productos...</p>
           </Col>
         </Row>
       )}
 
       {!cargando && productosFiltrados.length === 0 && (
-        <Alert variant="info" className="text-center">
+        <Alert variant="info" className="text-center alerta-marca">
           <i className="bi bi-info-circle me-2"></i>
           No se encontraron productos que coincidan con tu búsqueda.
         </Alert>
@@ -153,7 +155,7 @@ const Catalogo = () => {
           ))}
         </Row>
       )}
-    </div>
+    </Container>
   );
 };
 

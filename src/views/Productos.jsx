@@ -12,6 +12,7 @@ import TarjetaProducto from "../components/productos/TarjetasProductos";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import ModalQRProducto from "../components/productos/ModalQRProducto";
+import EncabezadoVista from "../components/layout/EncabezadoVista";
 
 const Productos = () => {
   const [productos, setProductos] = useState([]);
@@ -721,38 +722,33 @@ const Productos = () => {
   };
 
   return (
-    <Container className="mt-3">
-      <Row className="align-items-center mb-3">
-        <Col className="d-flex align-items-center">
-          <h3 className="mb-0">
-            <i className="bi-bag-heart-fill me-2"></i> Productos
-          </h3>
-        </Col>
-
-        <Col
-          xs={12}
-          sm={12}
-          md={12}
-          lg={5}
-          className="text-end d-flex gap-2 justify-content-end mt-2 mt-lg-0"
-        >
-          <Button
-            onClick={generarPDF}
-            variant="success"
-            size="md"
-            title="Exportar catálogo en PDF"
-          >
-            <i className="bi-file-pdf"></i>
-            <span className="d-none d-sm-inline ms-2">Exportar PDF</span>
-          </Button>
-          <Button onClick={() => setMostrarModal(true)} size="md">
-            <i className="bi-plus-lg"></i>
-            <span className="d-none d-sm-inline ms-2">Nuevo Producto</span>
-          </Button>
-        </Col>
-      </Row>
-
-      <hr />
+    <Container fluid className="vista-contenedor px-3 px-md-4">
+      <EncabezadoVista
+        titulo="Productos"
+        icono="bi bi-bag-heart-fill"
+        subtitulo="Administra el catálogo de productos del negocio"
+        acciones={
+          <>
+            <Button
+              onClick={generarPDF}
+              className="btn-marca-outline"
+              size="md"
+              title="Exportar catálogo en PDF"
+            >
+              <i className="bi-file-pdf"></i>
+              <span className="d-none d-sm-inline ms-2">Exportar PDF</span>
+            </Button>
+            <Button
+              onClick={() => setMostrarModal(true)}
+              className="btn-marca"
+              size="md"
+            >
+              <i className="bi-plus-lg"></i>
+              <span className="d-none d-sm-inline ms-2">Nuevo Producto</span>
+            </Button>
+          </>
+        }
+      />
 
       <Row className="mb-4">
         <Col md={6} lg={5}>
@@ -779,7 +775,8 @@ const Productos = () => {
 
       <Row>
         <Col className="d-none d-lg-block">
-          <TablaProductos
+          <div className="vista-panel">
+            <TablaProductos
             productos={productosFiltrados.slice(
               (paginaActual - 1) * registrosPorPagina,
               paginaActual * registrosPorPagina,
@@ -792,6 +789,7 @@ const Productos = () => {
             generarQRImagen={generarQRImagen}
             copiarProducto={copiarProducto}
           />
+          </div>
         </Col>
       </Row>
 

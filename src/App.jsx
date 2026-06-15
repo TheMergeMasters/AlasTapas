@@ -13,6 +13,7 @@ import Dashboard from "./views/Dashboard";
 import Login from "./views/Login";
 import RutaProtegida from "./components/rutas/RutaProtegida";
 import Pagina404 from "./views/Pagina404";
+import "./styles/tema.css";
 import "./App.css";
 
 
