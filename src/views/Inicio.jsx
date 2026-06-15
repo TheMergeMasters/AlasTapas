@@ -100,27 +100,32 @@ const Inicio = () => {
     if (pieChartRef.current) {
       if (pieChartInstance.current) {
         pieChartInstance.current.destroy();
+        pieChartInstance.current = null;
       }
 
-      const categorias =
-        estadisticas.ventasPorCategoria.length > 0
-          ? estadisticas.ventasPorCategoria
-          : [{ name: "Sin datos", value: 1 }];
-
-      pieChartInstance.current = new ChartJS(pieChartRef.current, {
-        type: "doughnut",
-        data: {
-          labels: categorias.map((c) => c.name),
-          datasets: [
-            {
-              data: categorias.map((c) => c.value),
-              backgroundColor: categorias.map(
-                (_, i) => COLORES[i % COLORES.length],
-              ),
+      if (estadisticas.ventasPorCategoria.length > 0) {
+        pieChartInstance.current = new ChartJS(pieChartRef.current, {
+          type: "doughnut",
+          data: {
+            labels: estadisticas.ventasPorCategoria.map((c) => c.name),
+            datasets: [
+              {
+                data: estadisticas.ventasPorCategoria.map((c) => c.value),
+                backgroundColor: estadisticas.ventasPorCategoria.map(
+                  (_, i) => COLORES[i % COLORES.length],
+                ),
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: "bottom" },
             },
-          ],
-        },
-      });
+          },
+        });
+      }
     }
 
     return () => {
@@ -151,7 +156,7 @@ const Inicio = () => {
       const productoCategoriaMap = {};
 
       productos?.forEach((p) => {
-        productoCategoriaMap[p.nombre_producto] =
+        productoCategoriaMap[Number(p.id_producto)] =
           categoriasMap[p.categoria_producto] || "Sin categoría";
       });
 
@@ -202,8 +207,9 @@ const Inicio = () => {
       detalles?.forEach((det) => {
         productosVendidos += Number(det.cantidad || 0);
 
+        const idProducto = Number(det.nombre_producto);
         const categoria =
-          productoCategoriaMap[det.nombre_producto] || "Sin categoría";
+          productoCategoriaMap[idProducto] || "Sin categoría";
 
         ventasCategoriaObj[categoria] =
           (ventasCategoriaObj[categoria] || 0) + Number(det.cantidad || 0);
@@ -703,6 +709,17 @@ const Inicio = () => {
                 }}
               >
                 <canvas ref={pieChartRef} />
+                {estadisticas.ventasPorCategoria.length === 0 && (
+                  <div
+                    className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center text-muted text-center px-3"
+                    style={{ pointerEvents: "none" }}
+                  >
+                    <div>
+                      <i className="bi bi-pie-chart d-block fs-1 mb-2" />
+                      No hay ventas por categoría en este periodo
+                    </div>
+                  </div>
+                )}
               </div>
             </Card.Body>
 

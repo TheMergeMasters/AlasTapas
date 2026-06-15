@@ -2,15 +2,20 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import FormularioLogin from "../components/login/FormularioLogin";
 import { supabase } from "../database/supabaseconfig";
-
+import "../components/login/login.css";
 
 const Login = () => {
   const [usuario, setUsuario] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [error, setError] = useState(null);
+  const [cargando, setCargando] = useState(false);
   const navegar = useNavigate();
 
-  const iniciarsesion = async () => {
+  const iniciarsesion = async (e) => {
+    e?.preventDefault();
+    setError(null);
+    setCargando(true);
+
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: usuario,
@@ -30,42 +35,38 @@ const Login = () => {
     } catch (err) {
       setError("Error al conectar con el servidor");
       console.error("Error en la solicitud:", err);
+    } finally {
+      setCargando(false);
     }
   };
 
-  const estiloContenedor = {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "linear-gradient(135deg, #FFDEE9, #B5FFFC)",
-    overflow: "hidden",
-    padding: "20px",
-  };
-    useEffect(() => {
+  useEffect(() => {
     const usuarioGuardado = localStorage.getItem("usuario-supabase");
     if (usuarioGuardado) {
       navegar("/");
     }
   }, [navegar]);
-  
+
   return (
-    <div style={estiloContenedor}>
-      <FormularioLogin
-        usuario={usuario}
-        contrasena={contrasena}
-        error={error}
-        setUsuario={setUsuario}
-        setContrasena={setContrasena}
-        iniciarSesion={iniciarsesion}
-      />
+    <div className="login-pagina">
+      <div className="login-fondo" aria-hidden="true">
+        <div className="login-circulo login-circulo-1" />
+        <div className="login-circulo login-circulo-2" />
+      </div>
+
+      <div className="login-contenedor">
+        <FormularioLogin
+          usuario={usuario}
+          contrasena={contrasena}
+          error={error}
+          cargando={cargando}
+          setUsuario={setUsuario}
+          setContrasena={setContrasena}
+          iniciarSesion={iniciarsesion}
+        />
+      </div>
     </div>
   );
-
-  
 };
+
 export default Login;
