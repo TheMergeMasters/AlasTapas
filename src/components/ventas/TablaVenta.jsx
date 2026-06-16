@@ -10,6 +10,7 @@ const TablaVenta = ({
   cargando,
   abrirModalEdicion,
   abrirModalCancelacion,
+  numeracionPorFecha = {},
 }) => {
   return (
     <>
@@ -22,7 +23,7 @@ const TablaVenta = ({
         <Table striped borderless hover responsive className="align-middle">
           <thead>
             <tr>
-              <th>ID Venta</th>
+              <th>Venta #</th>
               <th>Orden</th>
               <th>Cliente</th>
               <th className="d-none d-md-table-cell">Productos</th>
@@ -43,7 +44,7 @@ const TablaVenta = ({
 
               return (
                 <tr key={v.id_venta}>
-                  <td className="fw-bold">#{v.id_venta}</td>
+                  <td className="fw-bold">#{numeracionPorFecha[v.id_venta] || v.id_venta}</td>
                   <td>#{v.id_orden}</td>
                   <td>{cliente?.nombre_cliente || "Cliente"}</td>
                   <td className="d-none d-md-table-cell">
@@ -95,7 +96,8 @@ const TablaVenta = ({
                       onClick={() =>
                         abrirModalCancelacion && abrirModalCancelacion(v)
                       }
-                      title="Cancelar Venta"
+                      disabled={v.estado_venta === false}
+                      title={v.estado_venta === false ? "Venta ya cancelada" : "Cancelar Venta"}
                     >
                       <i className="bi bi-x-circle"></i>
                     </Button>

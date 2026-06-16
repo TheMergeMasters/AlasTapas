@@ -9,6 +9,7 @@ const TablaOrdenes = ({
   abrirModalEdicion,
   abrirModalCancelacion,
   cargando,
+  numeracionPorFecha = {},
 }) => {
   const formatearFecha = (fechaString) => {
     if (!fechaString) return "-";
@@ -27,7 +28,7 @@ const TablaOrdenes = ({
         <Table striped borderless hover responsive className="align-middle">
           <thead>
             <tr>
-              <th>ID Orden</th>
+              <th>Orden #</th>
               <th>Cliente</th>
               <th>Fecha y Hora</th>
               <th className="d-none d-md-table-cell">
@@ -45,7 +46,7 @@ const TablaOrdenes = ({
 
               return (
                 <tr key={o.id_orden}>
-                  <td className="fw-bold">#{o.id_orden}</td>
+                  <td className="fw-bold">#{numeracionPorFecha[o.id_orden] || o.id_orden}</td>
                   <td>{cliente?.nombre_cliente || "Cliente"}</td>
                   <td>{formatearFecha(o.fecha_orden)}</td>
                   <td className="d-none d-md-table-cell">
@@ -89,8 +90,8 @@ const TablaOrdenes = ({
                       size="sm"
                       className="m-1"
                       onClick={() => abrirModalEdicion && abrirModalEdicion(o)}
-                      disabled={detalles.length > 0 && detalles.every(d => d.estado_orden === true || d.estado_orden === "true")}
-                      title={detalles.length > 0 && detalles.every(d => d.estado_orden === true || d.estado_orden === "true") ? "Orden completada - No se puede editar" : "Editar Orden"}
+                      disabled={detalles.length === 0 || (detalles.length > 0 && detalles.every(d => d.estado_orden === true || d.estado_orden === "true"))}
+                      title={detalles.length === 0 ? "Orden cancelada - No se puede editar" : detalles.length > 0 && detalles.every(d => d.estado_orden === true || d.estado_orden === "true") ? "Orden completada - No se puede editar" : "Editar Orden"}
                     >
                       <i className="bi bi-pencil"></i>
                     </Button>
@@ -100,7 +101,8 @@ const TablaOrdenes = ({
                       onClick={() =>
                         abrirModalCancelacion && abrirModalCancelacion(o)
                       }
-                      title="Cancelar Orden"
+                      disabled={detalles.length === 0}
+                      title={detalles.length === 0 ? "Orden ya cancelada" : "Cancelar Orden"}
                     >
                       <i className="bi bi-x-circle"></i>
                     </Button>

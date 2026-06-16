@@ -41,9 +41,45 @@ const Ordenes = () => {
   // Estado de Notificaciones
   const [toast, setToast] = useState({ mostrar: false, mensaje: "", tipo: "" });
 
+  // Filtro por fecha
+  const obtenerFechaActualFormato = () => {
+    const hoy = new Date();
+    const year = hoy.getFullYear();
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoy.getDate()).padStart(2, '0');
+    return `${year}-${mes}-${dia}`;
+  };
+  const [fechaSeleccionada, setFechaSeleccionada] = useState(obtenerFechaActualFormato());
+
   // Paginación
   const [registrosPorPagina, establecerRegistrosPorPagina] = useState(5);
   const [paginaActual, establecerPaginaActual] = useState(1);
+
+  // Función para numerar órdenes por fecha
+  const obtenerNumeracionOrdenesPorFecha = (ordenes) => {
+    const mapa = {};
+    const fechasOrdenadas = {};
+
+    // Agrupar órdenes por fecha (solo la parte de fecha, sin hora)
+    ordenes.forEach((orden) => {
+      const fecha = new Date(orden.fecha_orden).toLocaleDateString();
+      if (!fechasOrdenadas[fecha]) {
+        fechasOrdenadas[fecha] = [];
+      }
+      fechasOrdenadas[fecha].push(orden);
+    });
+
+    // Numerar dentro de cada fecha
+    Object.values(fechasOrdenadas).forEach((ordenesDelDia) => {
+      ordenesDelDia.forEach((orden, index) => {
+        mapa[orden.id_orden] = index + 1;
+      });
+    });
+
+    return mapa;
+  };
+
+  const numeracionPorFecha = obtenerNumeracionOrdenesPorFecha(ordenesFiltradas);
 
   const ordenesOrdenadasProcesadas = [...ordenesFiltradas].sort(
     (a, b) => b.id_orden - a.id_orden,
@@ -60,27 +96,34 @@ const Ordenes = () => {
     cargarOrdenesYDetalles();
   }, []);
 
-  // Filtrado de búsquedas interactivo
+  // Filtrado por fecha
   useEffect(() => {
-    if (!textoBusqueda.trim()) {
-      setOrdenesFiltradas(ordenes);
-    } else {
-      const textoLower = textoBusqueda.toLowerCase().trim();
-      const filtrados = ordenes.filter((o) => {
-        const idOrdenStr = o.id_orden.toString();
-        const itemsDetalle = detallesMap[o.id_orden] || [];
-        const contieneProducto = itemsDetalle.some((d) => {
-          // Buscamos el nombre comercial usando d.nombre_producto (que contiene el ID)
-          const prod = productosDisponibles.find(
-            (p) => p.id_producto.toString() === d.nombre_producto?.toString(),
-          );
-          return prod?.nombre_producto?.toLowerCase().includes(textoLower);
-        });
-        return idOrdenStr.includes(textoLower) || contieneProducto;
+    if (fechaSeleccionada && ordenes.length > 0) {
+      const ordenesDelDia = ordenes.filter((o) => {
+        // Extrae solo la parte de fecha (YYYY-MM-DD) del timestamp ISO sin afectar por zona horaria
+        const fechaOrden = o.fecha_orden?.substring(0, 10) || "";
+        return fechaOrden === fechaSeleccionada;
       });
-      setOrdenesFiltradas(filtrados);
+      // Aplicar filtro de búsqueda sobre las órdenes del día
+      if (!textoBusqueda.trim()) {
+        setOrdenesFiltradas(ordenesDelDia);
+      } else {
+        const textoLower = textoBusqueda.toLowerCase().trim();
+        const filtrados = ordenesDelDia.filter((o) => {
+          const idOrdenStr = o.id_orden.toString();
+          const itemsDetalle = detallesMap[o.id_orden] || [];
+          const contieneProducto = itemsDetalle.some((d) => {
+            const prod = productosDisponibles.find(
+              (p) => p.id_producto.toString() === d.nombre_producto?.toString(),
+            );
+            return prod?.nombre_producto?.toLowerCase().includes(textoLower);
+          });
+          return idOrdenStr.includes(textoLower) || contieneProducto;
+        });
+        setOrdenesFiltradas(filtrados);
+      }
     }
-  }, [textoBusqueda, ordenes, detallesMap, productosDisponibles]);
+  }, [fechaSeleccionada, textoBusqueda, ordenes, detallesMap, productosDisponibles]);
 
   useEffect(() => {
     const totalPaginas = Math.max(
@@ -162,7 +205,8 @@ const agregarOrden = async () => {
       fechaFinal = new Date().toISOString(); // Formato ISO estricto que Supabase ama (Ej: 2026-05-18T23:00:00Z)
     } else {
       // Si el usuario sí eligió una fecha, la convertimos a formato ISO válido para PostgreSQL
-      fechaFinal = new Date(fechaFinal).toISOString();
+      // Agregamos :00Z para mantener la fecha y hora exacta sin cambios de zona horaria
+      fechaFinal = fechaFinal + ":00Z";
     }
 
     // 2. Inserción de la Cabecera de la Orden
@@ -355,6 +399,22 @@ const agregarOrden = async () => {
             placeholder="Buscar por ID de orden o por platillo..."
           />
         </Col>
+        <Col md={6} lg={3}>
+          <div>
+            <label className="form-label mb-2 d-block fw-500">
+              <i className="bi bi-calendar-event me-2"></i>Selecciona una Fecha
+            </label>
+            <input
+              type="date"
+              className="form-control"
+              value={fechaSeleccionada}
+              onChange={(e) => {
+                setFechaSeleccionada(e.target.value);
+                establecerPaginaActual(1);
+              }}
+            />
+          </div>
+        </Col>
       </Row>
 
       {/* Vista Móvil */}
@@ -367,6 +427,7 @@ const agregarOrden = async () => {
             clientesDisponibles={clientesDisponibles}
             abrirModalEdicion={abrirModalEdicion}
             abrirModalCancelacion={abrirModalCancelacion}
+            numeracionPorFecha={numeracionPorFecha}
           />
         </Col>
       </Row>
@@ -383,6 +444,7 @@ const agregarOrden = async () => {
             cargando={cargando}
             abrirModalEdicion={abrirModalEdicion}
             abrirModalCancelacion={abrirModalCancelacion}
+            numeracionPorFecha={numeracionPorFecha}
           />
           </div>
         </Col>

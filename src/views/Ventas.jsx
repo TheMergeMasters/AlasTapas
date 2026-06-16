@@ -44,9 +44,48 @@ const Ventas = () => {
   // Estado de Notificaciones
   const [toast, setToast] = useState({ mostrar: false, mensaje: "", tipo: "" });
 
+  // Filtro por fecha
+  const obtenerFechaActualFormato = () => {
+    const hoy = new Date();
+    const year = hoy.getFullYear();
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoy.getDate()).padStart(2, '0');
+    return `${year}-${mes}-${dia}`;
+  };
+  const [fechaSeleccionada, setFechaSeleccionada] = useState(obtenerFechaActualFormato());
+
   // Paginación
   const [registrosPorPagina, establecerRegistrosPorPagina] = useState(5);
   const [paginaActual, establecerPaginaActual] = useState(1);
+
+  // Función para numerar ventas por fecha
+  const obtenerNumeracionVentasPorFecha = (ventas) => {
+    const mapa = {};
+    const fechasOrdenadas = {};
+
+    // Agrupar ventas por fecha (solo la parte de fecha, sin hora)
+    ventas.forEach((venta) => {
+      const orden = ordenesDisponibles.find(
+        (o) => o.id_orden.toString() === venta.id_orden?.toString(),
+      );
+      const fecha = orden?.fecha_orden?.substring(0, 10) || "";
+      if (!fechasOrdenadas[fecha]) {
+        fechasOrdenadas[fecha] = [];
+      }
+      fechasOrdenadas[fecha].push(venta);
+    });
+
+    // Numerar dentro de cada fecha
+    Object.values(fechasOrdenadas).forEach((ventasDelDia) => {
+      ventasDelDia.forEach((venta, index) => {
+        mapa[venta.id_venta] = index + 1;
+      });
+    });
+
+    return mapa;
+  };
+
+  const numeracionPorFecha = obtenerNumeracionVentasPorFecha(ventasFiltradas);
 
   const ventasOrdenadasProcesadas = [...ventasFiltradas].sort(
     (a, b) => b.id_venta - a.id_venta,
@@ -61,29 +100,39 @@ const Ventas = () => {
     cargarDatos();
   }, []);
 
-  // Filtrado de búsquedas interactivo
+  // Filtrado por fecha
   useEffect(() => {
-    if (!textoBusqueda.trim()) {
-      setVentasFiltradas(ventas);
-    } else {
-      const textoLower = textoBusqueda.toLowerCase().trim();
-      const filtradas = ventas.filter((v) => {
-        const idVentaStr = v.id_venta.toString();
-        const idOrdenStr = v.id_orden.toString();
-        const cliente = clientesDisponibles.find(
-          (c) => c.id_cliente.toString() === ordenesDisponibles.find(
-            (o) => o.id_orden.toString() === v.id_orden?.toString()
-          )?.id_cliente?.toString(),
+    if (fechaSeleccionada && ventas.length > 0) {
+      const ventasDelDia = ventas.filter((v) => {
+        const orden = ordenesDisponibles.find(
+          (o) => o.id_orden.toString() === v.id_orden?.toString(),
         );
-        return (
-          idVentaStr.includes(textoLower) ||
-          idOrdenStr.includes(textoLower) ||
-          cliente?.nombre_cliente?.toLowerCase().includes(textoLower)
-        );
+        const fechaVenta = orden?.fecha_orden?.substring(0, 10) || "";
+        return fechaVenta === fechaSeleccionada;
       });
-      setVentasFiltradas(filtradas);
+      // Aplicar filtro de búsqueda sobre las ventas del día
+      if (!textoBusqueda.trim()) {
+        setVentasFiltradas(ventasDelDia);
+      } else {
+        const textoLower = textoBusqueda.toLowerCase().trim();
+        const filtradas = ventasDelDia.filter((v) => {
+          const idVentaStr = v.id_venta.toString();
+          const idOrdenStr = v.id_orden.toString();
+          const cliente = clientesDisponibles.find(
+            (c) => c.id_cliente.toString() === ordenesDisponibles.find(
+              (o) => o.id_orden.toString() === v.id_orden?.toString()
+            )?.id_cliente?.toString(),
+          );
+          return (
+            idVentaStr.includes(textoLower) ||
+            idOrdenStr.includes(textoLower) ||
+            cliente?.nombre_cliente?.toLowerCase().includes(textoLower)
+          );
+        });
+        setVentasFiltradas(filtradas);
+      }
     }
-  }, [textoBusqueda, ventas, clientesDisponibles, ordenesDisponibles]);
+  }, [fechaSeleccionada, textoBusqueda, ventas, clientesDisponibles, ordenesDisponibles]);
 
   useEffect(() => {
     const totalPaginas = Math.max(
@@ -168,7 +217,7 @@ const Ventas = () => {
     return total;
   };
 
-  const manejoCambioInput = (e) => {
+  const manejoCambioInput = (e  ) => {
     const { name, value } = e.target;
     setNuevaVenta((prev) => ({
       ...prev,
@@ -354,6 +403,22 @@ const Ventas = () => {
             placeholder="Buscar por ID venta, orden o cliente..."
           />
         </Col>
+        <Col md={6} lg={3}>
+          <div>
+            <label className="form-label mb-2 d-block fw-500">
+              <i className="bi bi-calendar-event me-2"></i>Selecciona una Fecha
+            </label>
+            <input
+              type="date"
+              className="form-control"
+              value={fechaSeleccionada}
+              onChange={(e) => {
+                setFechaSeleccionada(e.target.value);
+                establecerPaginaActual(1);
+              }}
+            />
+          </div>
+        </Col>
       </Row>
 
       {/* Vista Móvil */}
@@ -367,6 +432,7 @@ const Ventas = () => {
             productosDisponibles={productosDisponibles}
             abrirModalEdicion={abrirModalEdicion}
             abrirModalCancelacion={abrirModalCancelacion}
+            numeracionPorFecha={numeracionPorFecha}
           />
         </Col>
       </Row>
@@ -384,6 +450,7 @@ const Ventas = () => {
             cargando={cargando}
             abrirModalEdicion={abrirModalEdicion}
             abrirModalCancelacion={abrirModalCancelacion}
+            numeracionPorFecha={numeracionPorFecha}
           />
           </div>
         </Col>

@@ -8,6 +8,7 @@ const TarjetaOrdenes = ({
   clientesDisponibles,
   abrirModalEdicion,
   abrirModalCancelacion,
+  numeracionPorFecha = {},
 }) => {
   const [idTarjetaActiva, setIdTarjetaActiva] = useState(null);
 
@@ -49,7 +50,7 @@ const TarjetaOrdenes = ({
               <div className="d-flex justify-content-between align-items-center mb-2">
                 <div>
                   <span className="fw-bold text-primary">
-                    Orden #{o.id_orden}
+                    Orden #{numeracionPorFecha[o.id_orden] || o.id_orden}
                   </span>
                   <br />
                   <span className="text-secondary small">
@@ -110,8 +111,8 @@ const TarjetaOrdenes = ({
                   size="sm"
                   className="w-50 me-1"
                   onClick={() => abrirModalEdicion && abrirModalEdicion(o)}
-                  disabled={detalles.length > 0 && detalles.every(d => d.estado_orden === true || d.estado_orden === "true")}
-                  title={detalles.length > 0 && detalles.every(d => d.estado_orden === true || d.estado_orden === "true") ? "Orden completada - No se puede editar" : "Editar Orden"}
+                  disabled={detalles.length === 0 || (detalles.length > 0 && detalles.every(d => d.estado_orden === true || d.estado_orden === "true"))}
+                  title={detalles.length === 0 ? "Orden cancelada - No se puede editar" : detalles.length > 0 && detalles.every(d => d.estado_orden === true || d.estado_orden === "true") ? "Orden completada - No se puede editar" : "Editar Orden"}
                 >
                   <i className="bi bi-pencil me-1"></i> Editar
                 </Button>
@@ -122,6 +123,8 @@ const TarjetaOrdenes = ({
                   onClick={() =>
                     abrirModalCancelacion && abrirModalCancelacion(o)
                   }
+                  disabled={detalles.length === 0}
+                  title={detalles.length === 0 ? "Orden ya cancelada" : "Cancelar Orden"}
                 >
                   <i className="bi bi-x-circle me-1"></i> Cancelar
                 </Button>

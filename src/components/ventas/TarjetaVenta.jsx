@@ -9,6 +9,7 @@ const TarjetaVenta = ({
   productosDisponibles,
   abrirModalEdicion,
   abrirModalCancelacion,
+  numeracionPorFecha = {},
 }) => {
   const [idTarjetaActiva, setIdTarjetaActiva] = useState(null);
 
@@ -47,7 +48,7 @@ const TarjetaVenta = ({
               <div className="d-flex justify-content-between align-items-center mb-2">
                 <div>
                   <span className="fw-bold text-primary">
-                    Venta #{v.id_venta}
+                    Venta #{numeracionPorFecha[v.id_venta] || v.id_venta}
                   </span>
                   <br />
                   <span className="text-secondary small">
@@ -122,6 +123,8 @@ const TarjetaVenta = ({
                   onClick={() =>
                     abrirModalCancelacion && abrirModalCancelacion(v)
                   }
+                  disabled={v.estado_venta === false}
+                  title={v.estado_venta === false ? "Venta ya cancelada" : "Cancelar Venta"}
                 >
                   <i className="bi bi-x-circle me-1"></i> Cancelar
                 </Button>
